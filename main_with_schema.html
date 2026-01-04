@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-342K7JN2C1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-342K7JN2C1');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roman Lebedev — Backend и интеграции под ключ</title>
+
+  
+  <!-- SEO -->
+  <meta name="description" content="Full‑stack разработка для бизнеса: автоматизация, сайты, ERP/CRM, SaaS, интеграции и боты. Python/Django/FastAPI, Postgres, Docker. Напишите в Telegram/WhatsApp." />
+  <link rel="canonical" href="https://rlebedev.dev/" />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="author" content="Roman Lebedev" />
+  <meta name="theme-color" content="#0d0f12" />
+
+  <!-- Open Graph (Telegram / WhatsApp / Facebook / LinkedIn) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:site_name" content="Roman Lebedev" />
+  <meta property="og:url" content="https://rlebedev.dev/" />
+  <meta property="og:title" content="Roman Lebedev — Backend и интеграции под ключ" />
+  <meta property="og:description" content="Full‑stack разработка для бизнеса: автоматизация, сайты, ERP/CRM, SaaS, интеграции и боты. Python/Django/FastAPI, Postgres, Docker. Напишите в Telegram/WhatsApp." />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Roman Lebedev — Backend и интеграции под ключ" />
+  <meta name="twitter:description" content="Full‑stack разработка для бизнеса: автоматизация, сайты, ERP/CRM, SaaS, интеграции и боты. Python/Django/FastAPI, Postgres, Docker. Напишите в Telegram/WhatsApp." />
+
+<!-- можно убрать Google Fonts, если хочешь полностью оффлайн -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0d0f12;
+      --panel:#11141a;
+      --panel2:#0f1217;
+      --text:#e8edf5;
+      --muted:#93a0b4;
+      --accent:#00c2d7;
+      --accent2:#58f0ff;
+      --line:rgba(255,255,255,.08);
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 14px;
+      --max: 1100px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x:hidden;
+    }
+
+    /* ====== BACKGROUND (microchip) ====== */
+    .bg-wrap{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      z-index:-2;
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(0,194,215,.10), transparent 60%),
+        radial-gradient(900px 500px at 80% 30%, rgba(88,240,255,.07), transparent 60%),
+        radial-gradient(900px 500px at 50% 90%, rgba(0,194,215,.06), transparent 60%),
+        linear-gradient(180deg, #0b0d10 0%, #0d0f12 40%, #0b0d10 100%);
+    }
+
+    /* SVG pattern as data-uri */
+    .bg-wrap::before{
+      content:"";
+      position:absolute; inset:-2px;
+      opacity:.22;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700' viewBox='0 0 700 700'%3E%3Cg fill='none' stroke='%23cfe7ff' stroke-opacity='0.22' stroke-width='2'%3E%3Cpath d='M40 120h180v80h120v-60h140'/%3E%3Cpath d='M80 520h200v-120h160v180h120'/%3E%3Cpath d='M560 90v160h-90v90h170'/%3E%3Cpath d='M120 240v140h90v120'/%3E%3Cpath d='M500 520v-120h-80v-80h-80'/%3E%3Cpath d='M260 120v100h80v80'/%3E%3C/g%3E%3Cg fill='%23cfe7ff' fill-opacity='0.18'%3E%3Ccircle cx='40' cy='120' r='6'/%3E%3Ccircle cx='220' cy='120' r='6'/%3E%3Ccircle cx='220' cy='200' r='6'/%3E%3Ccircle cx='340' cy='200' r='6'/%3E%3Ccircle cx='340' cy='140' r='6'/%3E%3Ccircle cx='480' cy='140' r='6'/%3E%3Ccircle cx='80' cy='520' r='6'/%3E%3Ccircle cx='280' cy='520' r='6'/%3E%3Ccircle cx='280' cy='400' r='6'/%3E%3Ccircle cx='440' cy='400' r='6'/%3E%3Ccircle cx='440' cy='580' r='6'/%3E%3Ccircle cx='560' cy='580' r='6'/%3E%3Ccircle cx='560' cy='90' r='6'/%3E%3Ccircle cx='560' cy='250' r='6'/%3E%3Ccircle cx='470' cy='250' r='6'/%3E%3Ccircle cx='470' cy='340' r='6'/%3E%3Ccircle cx='640' cy='340' r='6'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 520px 520px;
+      background-position: 0 0;
+      filter: blur(.2px);
+    }
+
+    .bg-wrap::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(90deg, rgba(13,15,18,.92) 0%, rgba(13,15,18,.55) 35%, rgba(13,15,18,.85) 100%),
+        radial-gradient(700px 500px at 50% 20%, rgba(0,194,215,.10), transparent 70%);
+      z-index:-1;
+    }
+
+    /* ====== LAYOUT ====== */
+    .container{max-width: var(--max); margin: 0 auto; padding: 0 18px;}
+    section{padding: 74px 0;}
+    @media (max-width: 720px){ section{padding: 56px 0;} }
+
+    /* ====== HEADER / NAV ====== */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(13,15,18,.65);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 14px;
+      padding: 14px 0;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap: 12px;
+      min-width: 220px;
+    }
+    .brand .title{
+      display:flex; flex-direction:column;
+      line-height:1.2;
+    }
+    .brand .title strong{font-size: 14px; letter-spacing:.2px;}
+    .brand .title span{font-size: 12px; color: var(--muted);}
+
+    .logo{
+    width: 52px; height: 52px;  /* было 42px */
+    border-radius: 14px;  /* было 12px */
+    background: linear-gradient(180deg, rgba(0,194,215,.18), rgba(0,194,215,.05));
+    border: 1px solid rgba(0,194,215,.25);
+    box-shadow: 0 10px 30px rgba(0,194,215,.12);
+    display:grid; place-items:center;
+    position: relative;
+    overflow:hidden;
+    }
+    .logo svg{width: 44px; height: 44px; display:block;}
+    .logo::after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(88,240,255,.25), transparent 55%);
+      transform: rotate(12deg);
+    }
+
+    .nav-links{
+      display:flex; gap: 18px; align-items:center;
+    }
+    .nav-links a{
+      text-decoration:none; color: var(--muted);
+      font-weight: 600; font-size: 13px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      transition: .2s;
+    }
+    .nav-links a:hover{
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+
+    .nav-cta{
+      display:flex; gap: 10px; align-items:center;
+    }
+
+    .btn{
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .2px;
+      text-decoration:none;
+      display:inline-flex;
+      gap: 10px;
+      align-items:center;
+      border: 1px solid transparent;
+      transition: transform .15s ease, background .2s, border-color .2s;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px);}
+    .btn:active{transform: translateY(0);}
+
+    .btn-primary{
+      background: linear-gradient(180deg, var(--accent2), var(--accent));
+      color: #001318;
+      border-color: rgba(0,194,215,.35);
+      box-shadow: 0 12px 36px rgba(0,194,215,.18);
+    }
+    .btn-ghost{
+      background: rgba(255,255,255,.03);
+      border-color: rgba(255,255,255,.10);
+      color: var(--text);
+    }
+    .btn-ghost:hover{border-color: rgba(0,194,215,.25);}
+
+    /* Mobile menu */
+    .burger{
+      display:none;
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      cursor:pointer;
+      position: relative;
+    }
+    .burger span{
+      position:absolute; left: 11px; right:11px;
+      height:2px; background: rgba(232,237,245,.9);
+      border-radius: 999px;
+      transition: .2s;
+    }
+    .burger span:nth-child(1){top: 14px;}
+    .burger span:nth-child(2){top: 20px; opacity: .9;}
+    .burger span:nth-child(3){top: 26px;}
+
+    @media (max-width: 860px){
+      .nav-links{display:none;}
+      .nav-cta{display:none;}
+      .burger{display:inline-block;}
+      .brand{min-width:auto;}
+    }
+
+    .mobile-drawer{
+      display:none;
+      border-top: 1px solid var(--line);
+      background: rgba(13,15,18,.82);
+      backdrop-filter: blur(10px);
+      padding: 10px 0 14px;
+    }
+    .mobile-drawer.open{display:block;}
+    .mobile-drawer a{
+      display:block;
+      padding: 12px 14px;
+      margin: 6px 0;
+      border-radius: 12px;
+      color: var(--text);
+      text-decoration:none;
+      font-weight: 700;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .mobile-drawer a.secondary{
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* ====== HERO ====== */
+    .hero{
+      padding: 74px 0 40px;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 26px;
+      align-items:center;
+    }
+    @media (max-width: 920px){
+      .hero-grid{grid-template-columns: 1fr; gap: 18px;}
+    }
+
+    .badge{
+      display:inline-flex;
+      gap: 10px;
+      align-items:center;
+      padding: 8px 12px;
+      border: 1px solid rgba(0,194,215,.25);
+      background: rgba(0,194,215,.08);
+      border-radius: 999px;
+      color: var(--accent2);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .25px;
+      width: fit-content;
+      margin-bottom: 14px;
+    }
+    .badge .dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--accent2);
+      box-shadow: 0 0 0 6px rgba(0,194,215,.10);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    h1{
+      font-size: clamp(26px, 3.2vw, 44px);
+      line-height: 1.15;
+      letter-spacing: -.4px;
+      margin-bottom: 14px;
+    }
+    .lead{
+      color: var(--muted);
+      font-size: clamp(14px, 1.6vw, 17px);
+      max-width: 64ch;
+      margin-bottom: 18px;
+    }
+
+    .chips{
+      display:flex; flex-wrap:wrap; gap: 10px;
+      margin: 18px 0 22px;
+    }
+    .chip{
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      color: rgba(232,237,245,.92);
+    }
+
+    .hero-cta{display:flex; gap: 12px; flex-wrap:wrap; align-items:center;}
+    .hero-cta small{color: var(--muted); display:block; font-size: 12px;}
+
+    .hero-card{
+      position: relative;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      padding: 18px;
+      min-height: 280px;
+    }
+
+    .hero-card .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .stat{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.14);
+      padding: 14px;
+    }
+    .stat strong{display:block; font-size: 14px; margin-bottom: 6px;}
+    .stat span{color: var(--muted); font-size: 12px;}
+
+    .nodes{
+      position:absolute; inset:0;
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    /* animated “nodes” */
+    .node{
+      position:absolute;
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: var(--accent2);
+      box-shadow: 0 0 0 8px rgba(0,194,215,.10), 0 0 18px rgba(0,194,215,.25);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+    .node:nth-child(1){top: 26px; left: 24px; animation-delay: .1s;}
+    .node:nth-child(2){top: 80px; right: 36px; animation-delay: .6s;}
+    .node:nth-child(3){bottom: 42px; left: 40px; animation-delay: 1.0s;}
+    .node:nth-child(4){bottom: 28px; right: 62px; animation-delay: 1.6s;}
+
+    .trace{
+      position:absolute;
+      inset:-20px;
+      opacity:.22;
+      background-image:
+        linear-gradient(90deg, rgba(88,240,255,.18), transparent 55%),
+        linear-gradient(180deg, rgba(0,194,215,.14), transparent 60%);
+      transform: rotate(-8deg);
+      filter: blur(.2px);
+    }
+
+    @keyframes pulse{
+      0%,100%{transform: scale(1); opacity: .85;}
+      50%{transform: scale(1.4); opacity: 1;}
+    }
+
+    /* ====== SECTIONS ====== */
+    .section-title{
+      display:flex; align-items:end; justify-content:space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .section-title h2{
+      font-size: 22px;
+      color: var(--accent2);
+      letter-spacing: .2px;
+    }
+    .section-title p{
+      color: var(--muted);
+      max-width: 70ch;
+      font-size: 13px;
+    }
+
+    .grid-3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 920px){
+      .grid-3{grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.02));
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      position: relative;
+      overflow:hidden;
+      min-height: 140px;
+    }
+    .card::after{
+      content:"";
+      position:absolute; inset:-60px;
+      background: radial-gradient(400px 220px at 20% 10%, rgba(0,194,215,.16), transparent 60%);
+      opacity:.55;
+      transform: rotate(8deg);
+      pointer-events:none;
+    }
+    .card h3{
+      font-size: 15px;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .card p{
+      color: var(--muted);
+      font-size: 13px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .list{
+      display:grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .step{
+      display:flex; gap: 12px;
+      align-items:flex-start;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .step b{
+      width: 28px; height: 28px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      background: rgba(0,194,215,.12);
+      border: 1px solid rgba(0,194,215,.22);
+      color: var(--accent2);
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+    .step div strong{display:block; font-size: 14px; margin-bottom: 2px;}
+    .step div span{color: var(--muted); font-size: 13px;}
+
+    /* ====== CONTACT ====== */
+    .contact{
+      border-radius: calc(var(--radius) + 4px);
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,194,215,.08), rgba(255,255,255,.02));
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 920px){
+      .contact{grid-template-columns: 1fr;}
+    }
+
+    .contact form{
+      display:grid;
+      gap: 10px;
+    }
+    .field{
+      display:grid;
+      gap: 6px;
+    }
+    .field label{
+      font-size: 12px;
+      color: rgba(232,237,245,.85);
+      font-weight: 700;
+    }
+    .field input, .field textarea{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      color: var(--text);
+      outline: none;
+    }
+    .field textarea{min-height: 110px; resize: vertical;}
+    .hint{color: var(--muted); font-size: 12px;}
+
+    .contact-box{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      padding: 14px;
+    }
+    .contact-box strong{display:block; margin-bottom: 8px;}
+    .contact-links{
+      display:grid; gap: 10px; margin-top: 10px;
+    }
+    .link{
+      display:flex; justify-content:space-between; align-items:center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      text-decoration:none;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .link span{color: var(--muted); font-weight: 600;}
+    .link:hover{border-color: rgba(0,194,215,.25);}
+
+    footer{
+      padding: 28px 0 40px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* ====== REVEAL ANIMATIONS ====== */
+    .reveal{
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.visible{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto}
+      .reveal{opacity:1; transform:none; transition:none;}
+      .badge .dot, .node{animation:none;}
+      .btn{transition:none;}
+    }
+  </style>
+
+  <!-- Structured data (Schema.org) -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://rlebedev.dev/#roman-lebedev",
+      "name": "Roman Lebedev",
+      "url": "https://rlebedev.dev/",
+      "jobTitle": "Full‑stack разработчик",
+      "knowsAbout": [
+        "Python",
+        "Django",
+        "FastAPI",
+        "PostgreSQL",
+        "Redis",
+        "Docker",
+        "Интеграции API",
+        "Вебхуки",
+        "Автоматизация процессов",
+        "ETL",
+        "ERP",
+        "CRM",
+        "SaaS",
+        "DevOps",
+        "CI/CD",
+        "Мониторинг",
+        "BI / дашборды"
+      ],
+      "sameAs": [
+        "https://t.me/RomanL1991"
+      ],
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "contactType": "sales",
+          "url": "https://t.me/RomanL1991",
+          "availableLanguage": [
+            "ru"
+          ]
+        },
+        {
+          "@type": "ContactPoint",
+          "contactType": "sales",
+          "url": "https://wa.me/7714648717",
+          "telephone": "+7-714-648-7177",
+          "availableLanguage": [
+            "ru"
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://rlebedev.dev/#services",
+      "name": "Разработка и автоматизация для бизнеса — под ключ",
+      "url": "https://rlebedev.dev/",
+      "description": "Full-stack разработка для бизнеса: автоматизация, сайты, ERP/CRM, SaaS, интеграции и боты. Python/Django/FastAPI, Postgres, Docker. Напишите в Telegram/WhatsApp.",
+      "provider": {
+        "@id": "https://rlebedev.dev/#roman-lebedev"
+      },
+      "serviceType": [
+        "Интеграции и API",
+        "Автоматизация процессов",
+        "Разработка веб‑приложений и сайтов",
+        "Аналитика и данные (дашборды/BI, ETL)",
+        "Инфраструктура (VPS/VDS, DevOps, CI/CD, мониторинг)",
+        "Техподдержка и развитие проектов"
+      ],
+      "availableLanguage": [
+        "ru"
+      ]
+    }
+  ]
+}
+  </script>
+
+</head>
+
+<body>
+  <div class="bg-wrap"></div>
+
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="brand">
+            <div class="logo" aria-label="RL logo">
+                <!-- RL logo - terminal style (без рамки, курсор выровнен) -->
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <!-- Точки управления окном (сверху) -->
+                  <circle cx="16" cy="12" r="2.5" fill="#ff5f57"/>
+                  <circle cx="24" cy="12" r="2.5" fill="#ffbd2e"/>
+                  <circle cx="32" cy="12" r="2.5" fill="#28ca42"/>
+                  
+                  <!-- Символ терминала > (увеличен) -->
+                  <path d="M14 26 L26 32 L14 38" stroke="#58f0ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                  
+                  <!-- Символы RL как команда (увеличены) -->
+                  <text x="32" y="38" fill="#58f0ff" font-family="monospace" font-size="18" font-weight="bold">RL</text>
+                  
+                  <!-- Курсор мигающий (выровнен с текстом) -->
+                  <rect x="52" y="25" width="10" height="13" fill="#58f0ff">
+                    <animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/>
+                  </rect>
+                </svg>
+              </div>
+          <div class="title">
+            <strong>Roman Lebedev</strong>
+            <span>IT решения для Вашего бизнеса</span>
+          </div>
+        </div>
+
+        <nav class="nav-links" aria-label="Навигация">
+          <a href="#services">Услуги</a>
+          <a href="#cases">Кейсы</a>
+          <a href="#process">Процесс</a>
+          <a href="#contact">Контакты</a>
+        </nav>
+
+        <div class="nav-cta">
+          <!-- замени на свой телеграм -->
+          <!-- <a class="btn btn-ghost" href="#cases">Кейсы</a> -->
+          <a class="btn btn-primary" href="#contact">Обсудить задачу</a>
+        </div>
+
+        <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      <div class="mobile-drawer" id="drawer" aria-label="Мобильное меню">
+        <a class="secondary" href="#services">Услуги</a>
+        <a class="secondary" href="#cases">Кейсы</a>
+        <a class="secondary" href="#process">Процесс</a>
+        <a class="secondary" href="#contact">Контакты</a>
+        <a href="#contact">Обсудить задачу</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="reveal">
+          <div class="badge"><span class="dot"></span> Персональный эксперт · Разработчик ПО</div>
+          <h1>Fullstack-разработка и интеграции под ключ для бизнеса</h1>
+          <p class="lead">
+            Проектирую и запускаю сервисы, готовые к росту и высоким нагрузкам. CRM/ERP системы, Боты, Dashboard, Интеграции с любыми API.
+          </p>
+          <small>Использую современные и надежные технологии:</small>
+          <div class="chips" aria-label="Технологии">
+            <div class="chip">Python</div>
+            <div class="chip">Django / DRF</div>
+            <div class="chip">FastAPI</div>
+            <div class="chip">PostgreSQL</div>
+            <div class="chip">Redis</div>
+            <div class="chip">RabbitMQ</div>
+            <div class="chip">Celery</div>
+            <div class="chip">REST API</div>
+            <div class="chip">Docker</div>
+            <div class="chip">Nginx</div>
+            <div class="chip">WebSocket</div>
+            <div class="chip">Telegram Bot API</div>
+            <div class="chip">ElasticSearch</div>
+            <div class="chip">Linux</div>
+            <div class="chip">etc</div>
+          </div>
+
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#contact">Обсудить задачу</a>
+            <a class="btn btn-ghost" href="#cases">Смотреть кейсы</a>
+            <small>Посмотрите некоторые кейсы, которые уже дали результаты</small>
+          </div>
+        </div>
+
+        <aside class="hero-card reveal" aria-label="Карточка преимуществ">
+          <div class="trace"></div>
+          <div class="nodes" aria-hidden="true">
+            <div class="node"></div><div class="node"></div><div class="node"></div><div class="node"></div>
+          </div>
+
+          <div class="grid">
+            <div class="stat">
+              <strong>Под ключ</strong>
+              <span>От архитектуры и ТЗ до деплоя и документации.</span>
+            </div>
+            <div class="stat">
+              <strong>Этапность</strong>
+              <span>Понятно обозначенные этапы/вехи разработки их сроки и стоимость.</span>
+            </div>
+            <div class="stat">
+              <strong>Надежность</strong>
+              <span>Мониторинг, тесты, резервное копирование, обработка ошибок.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" class="reveal">
+      <div class="section-title">
+        <h2>Услуги</h2>
+        <p>Широкий перечень услуг, вот некоторые из них</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3>Интеграции и API</h3>
+          <p>Вебхуки, Синхронизации, Обмен данными с ERP/CRM, Банками, Логистикой, Внешними кабинетами.</p>
+        </div>
+        <div class="card">
+          <h3>Автоматизация процессов</h3>
+          <p>Парсинг и обработка данных, уведомления, ETL, отчёты, системы документооборота.</p>
+        </div>
+        <div class="card">
+          <h3>Разработка</h3>
+          <p>Веб-сайты и порталы (корпоративные, новостные, каталоги), CRM/ERP системы, Telegram/WhatsApp боты, интернет-магазины и маркетплейсы, мобильные приложения.</p>
+        </div>
+        <div class="card">
+            <h3>Аналитика и данные</h3>
+            <p>Дашборды и BI-системы, Аналитика данных, ETL процессы.</p>
+          </div>
+        <div class="card">
+          <h3>Инфраструктура</h3>
+          <p>Настройка серверов (VPS/VDS), DevOps и CI/CD, Оптимизация производительности, Мониторинг и алерты.</p>
+        </div>
+        <div class="card">
+            <h3>Техподдержка</h3>
+            <p>Сопровождение проектов, Исправление ошибок, Доработка существующих систем, Консультации.</p>
+          </div>
+      </div>
+    </section>
+
+    <!-- CASES -->
+    <section id="cases" class="reveal">
+      <div class="section-title">
+        <h2>Кейсы</h2>
+        <p>Проблема → Решение → Результат</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+            <h3>Разработка Web приложений</h3>
+            <p>От простой странички в интеренете (landing) до сложнейших ERP систем, базы знаний для сотрудников/клиентов, интернет-магазинов, маркетплейсов.</p>
+          </div>
+        <div class="card">
+            <h3>Репрайсер</h3>
+            <p>Нужно держать всегда актуальную цену, когда она постоянно меняется (курс валют, цена поставщика, цены конкурентов). Репрайсеры - сленговое название сервисов, которые станут менеджером цен Ваших товаров/услуг. Вы устанавливаете правила, уведомления - после чего всегда с актуальной ценой.</p>
+          </div>
+        <div class="card">
+          <h3>Автопривязка платежей</h3>
+          <p>Приходится в ручную сводить платежи с документами. Интеграционный сервис может взять на себя эту работу. Он не будет отклвдывать на потом, а сделает это сразу и если нужно, уведомит Вас.</p>
+        </div>
+        <div class="card">
+          <h3>Dashbords</h3>
+          <p>Хотите в режиме реалього времени видить процессы (отгрузки/поступления/платежи), фиксировать рекорды, чтобы всё было наглядно и демонстративно. Интеграция с внешними кабинетами (банков, логистических компаний, маркетплейсов) будет собирать в реальном времени информацию и давайть аналитику здесть и сейчас, так же собирая историю данных для ретроспективного анализа.</p>
+        </div>
+        <div class="card">
+          <h3>Умные уведомления</h3>
+          <p>Сотрудники теряют пручения в бесконечных группах месенджеров. Умные уведомления решат эту задачу: создайте задание, выбирите кандидатов на выполение, система напомнит создателю о статусе сама. Закрепит задачу под подписантом и напомнит ему.</p>
+        </div>
+        <div class="card">
+          <h3>Учёт рабочего времени</h3>
+          <p>Удаленная рабочая точка (склад) где требуется учет рабочего времени. Бот, который в заданное время запрашивает геолокацию сотрудника. Теперь точка начинает работу вовремя.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section id="process" class="reveal">
+      <div class="section-title">
+        <h2>Как работаю</h2>
+        <p>Не стоит усложнять простые вещи, работаю открыто и прозрачно</p>
+      </div>
+
+      <div class="list">
+        <div class="step">
+          <b>1</b>
+          <div><strong>Созвон/встреча и цели</strong><span>Уточняем задачу, ограничения, критерии успеха.</span></div>
+        </div>
+        <div class="step">
+          <b>2</b>
+          <div><strong>План и оценка</strong><span>Разбиваю на этапы, предлагаю варианты решений.</span></div>
+        </div>
+        <div class="step">
+          <b>3</b>
+          <div><strong>Разработка и демо</strong><span>Короткие итерации по этапам, прозрачные результаты. Показ, принятие или правки.</span></div>
+        </div>
+        <div class="step">
+          <b>4</b>
+          <div><strong>Запуск</strong><span>Деплой (бевое размещение), документация, гайды, передача, обучение.</span></div>
+        </div>
+        <div class="step">
+          <b>5</b>
+          <div><strong>Поддержка</strong><span>По договорённости: улучшения, оптимизация, сопровождение.</span></div>
+        </div>
+      </div>
+    </section>
+
+<!-- CONTACT -->
+<section id="contact" class="reveal">
+    <div class="section-title">
+      <h2>Контакты</h2>
+      <p>Напишите в удобный мессенджер — обсудим задачу и следующие шаги</p>
+    </div>
+  
+    <div class="contact" style="grid-template-columns: 1fr; max-width: 600px; margin: 0 auto;">
+      <aside class="contact-box">
+        <strong>Связь со мной</strong>
+        <div class="hint">Пишите, отвечаю в течении часа</div>
+  
+        <div class="contact-links">
+          <a class="link" href="https://t.me/RomanL1991" target="_blank" rel="noreferrer" style="font-size: 15px; padding: 16px 14px;">
+            <span style="display: flex; align-items: center; gap: 10px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM16.64 8.8C16.49 10.38 15.84 14.22 15.51 15.99C15.37 16.74 15.09 16.99 14.83 17.02C14.25 17.07 13.81 16.64 13.25 16.27C12.37 15.69 11.87 15.33 11.02 14.77C10.03 14.12 10.67 13.76 11.24 13.18C11.39 13.03 13.95 10.7 14 10.49C14.0069 10.4582 14.006 10.4252 13.9973 10.3938C13.9886 10.3624 13.9724 10.3337 13.95 10.31C13.89 10.26 13.81 10.28 13.74 10.29C13.65 10.31 12.25 11.24 9.52 13.08C9.12 13.35 8.76 13.49 8.44 13.48C8.08 13.47 7.4 13.28 6.89 13.11C6.26 12.91 5.77 12.8 5.81 12.45C5.83 12.27 6.08 12.09 6.55 11.9C9.47 10.63 11.41 9.79 12.38 9.39C15.16 8.23 15.73 8.03 16.11 8.03C16.19 8.03 16.38 8.05 16.5 8.15C16.6 8.23 16.63 8.34 16.64 8.42C16.63 8.48 16.65 8.66 16.64 8.8Z" fill="currentColor"/>
+              </svg>
+              Telegram
+            </span>
+            <span style="color: var(--accent2);">@RomanL1991</span>
+          </a>
+  
+          <a class="link" href="https://wa.me/7714648717" target="_blank" rel="noreferrer" style="font-size: 15px; padding: 16px 14px;">
+            <span style="display: flex; align-items: center; gap: 10px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12C2 13.89 2.525 15.66 3.438 17.168L2.546 20.2C2.49478 20.3741 2.49141 20.5587 2.53624 20.7346C2.58107 20.9104 2.67245 21.0709 2.80076 21.1992C2.92907 21.3276 3.08958 21.4189 3.26542 21.4638C3.44125 21.5086 3.62592 21.5052 3.8 21.454L6.832 20.562C8.39074 21.5051 10.1782 22.0025 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2ZM9.738 14.263C11.761 16.285 13.692 16.552 14.374 16.577C15.411 16.615 16.421 15.823 16.814 14.904C16.8636 14.7897 16.8787 14.6632 16.8575 14.5405C16.8364 14.4178 16.7799 14.3044 16.695 14.214C16.229 13.755 15.635 13.349 15.036 13.068C14.917 13.011 14.782 12.995 14.652 13.022C14.5219 13.0489 14.4028 13.1141 14.31 13.209L13.862 13.658C13.7581 13.7616 13.6149 13.8163 13.4675 13.8095C13.3201 13.8028 13.1825 13.7351 13.088 13.622C12.305 12.692 11.63 12.024 10.697 11.238C10.5828 11.1444 10.5138 11.0065 10.5065 10.8589C10.4993 10.7112 10.5543 10.5673 10.659 10.463L11.11 10.011C11.204 9.918 11.268 9.799 11.295 9.669C11.321 9.539 11.308 9.405 11.257 9.283C10.9746 8.68275 10.5677 8.08848 10.108 7.622C10.018 7.538 9.906 7.482 9.785 7.461C9.664 7.44 9.539 7.454 9.426 7.503C8.50557 7.89828 7.71443 8.91045 7.753 9.948C7.777 10.629 8.044 12.561 10.066 14.583L9.738 14.263Z" fill="currentColor"/>
+              </svg>
+              WhatsApp
+            </span>
+            <span style="color: var(--accent2);">+7 771 464 87 17</span>
+          </a>
+        </div>
+  
+        <div style="margin-top:14px" class="hint">
+          Расскажите о своей задаче, можете голосовым соощением, чем детальнее - тем интереснее. Я попробую максимально быстро ответить на запрос, мы так же можем обсудить детали и составить план.
+        </div>
+      </aside>
+    </div>
+  </section>
+
+    <footer>
+      <div class="container" style="padding:0">
+        © <span id="year"></span> Roman Lebedev · Backend & Integrations · RL
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile drawer
+    const burger = document.getElementById('burger');
+    const drawer = document.getElementById('drawer');
+
+    burger.addEventListener('click', () => {
+      const open = drawer.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    // Close drawer on link click
+    drawer.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        drawer.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // Reveal on scroll
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReduced) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) e.target.classList.add('visible');
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    } else {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    }
+    // Contact form -> mailto (guarded: form may be absent on the page)
+    const sendBtn = document.getElementById('sendBtn');
+    if (sendBtn) {
+      sendBtn.addEventListener('click', () => {
+        const name = document.getElementById('name')?.value?.trim() || '';
+        const contact = document.getElementById('contact')?.value?.trim() || '';
+        const message = document.getElementById('message')?.value?.trim() || '';
+
+        // TODO: замени на свой email:
+        const to = 'you@example.com';
+        const subject = encodeURIComponent('Заявка: Backend / интеграции (Roman Lebedev)');
+        const body = encodeURIComponent(
+          `Имя: ${name || '-'}
+Контакт: ${contact || '-'}
+
+Задача:
+${message || '-'}
+`
+        );
+
+        window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      });
+    }
+
+const contact = document.getElementById('contact').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      // TODO: замени на свой email:
+      const to = 'you@example.com';
+      const subject = encodeURIComponent('Заявка: Backend / интеграции (Roman Lebedev)');
+      const body = encodeURIComponent(
+        `Имя: ${name || '-'}\nКонтакт: ${contact || '-'}\n\nЗадача:\n${message || '-'}\n`
+      );
+
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+
+  </script>
+</body>
+</html>

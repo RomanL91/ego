@@ -14,7 +14,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roman Lebedev — Backend и интеграции под ключ</title>
 
-  <!-- можно убрать Google Fonts, если хочешь полностью оффлайн -->
+  
+  <!-- SEO -->
+  <meta name="description" content="Full‑stack разработка для бизнеса: автоматизация, сайты, ERP/CRM, SaaS, интеграции и боты. Python/Django/FastAPI, Postgres, Docker. Напишите в Telegram/WhatsApp." />
+  <link rel="canonical" href="https://rlebedev.dev/" />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="author" content="Roman Lebedev" />
+  <meta name="theme-color" content="#0d0f12" />
+
+  <!-- Open Graph (Telegram / WhatsApp / Facebook / LinkedIn) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:site_name" content="Roman Lebedev" />
+  <meta property="og:url" content="https://rlebedev.dev/" />
+  <meta property="og:title" content="Roman Lebedev — Backend и интеграции под ключ" />
+  <meta property="og:description" content="Full‑stack разработка для бизнеса: автоматизация, сайты, ERP/CRM, SaaS, интеграции и боты. Python/Django/FastAPI, Postgres, Docker. Напишите в Telegram/WhatsApp." />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Roman Lebedev — Backend и интеграции под ключ" />
+  <meta name="twitter:description" content="Full‑stack разработка для бизнеса: автоматизация, сайты, ERP/CRM, SaaS, интеграции и боты. Python/Django/FastAPI, Postgres, Docker. Напишите в Telegram/WhatsApp." />
+
+<!-- можно убрать Google Fonts, если хочешь полностью оффлайн -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -836,12 +857,31 @@
     } else {
       document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
     }
-
-    // Contact form -> mailto
+    // Contact form -> mailto (guarded: form may be absent on the page)
     const sendBtn = document.getElementById('sendBtn');
-    sendBtn.addEventListener('click', () => {
-      const name = document.getElementById('name').value.trim();
-      const contact = document.getElementById('contact').value.trim();
+    if (sendBtn) {
+      sendBtn.addEventListener('click', () => {
+        const name = document.getElementById('name')?.value?.trim() || '';
+        const contact = document.getElementById('contact')?.value?.trim();
+        const message = document.getElementById('message')?.value?.trim() || '';
+
+        // TODO: замени на свой email:
+        const to = 'you@example.com';
+        const subject = encodeURIComponent('Заявка: Backend / интеграции (Roman Lebedev)');
+        const body = encodeURIComponent(
+          `Имя: ${name || '-'}
+Контакт: ${contact || '-'}
+
+Задача:
+${message || '-'}
+`
+        );
+
+        window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      });
+    }
+
+const contact = document.getElementById('contact').value.trim();
       const message = document.getElementById('message').value.trim();
 
       // TODO: замени на свой email:
@@ -852,7 +892,7 @@
       );
 
       window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
-    });
+
   </script>
 </body>
 </html>

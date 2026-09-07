@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rlebedev.dev/sitemap.xml
+Sitemap: https://info.rlebedev.dev/sitemap.xml

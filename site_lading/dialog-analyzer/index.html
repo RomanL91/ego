@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dialog Analyzer — ИИ-разбор телефонных разговоров</title>
+<meta name="description" content="Транскрибация с разделением по спикерам, оценка диалога по методике руководителя, детерминированная сверка каждой цитаты. Итог считает код, а не модель. Flet, LangGraph.">
+<meta name="author" content="Роман Лебедев">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dialog Analyzer — ИИ-разбор телефонных разговоров">
+<meta property="og:description" content="Транскрибация с разделением по спикерам, оценка диалога по методике руководителя, детерминированная сверка каждой цитаты. Итог считает код, а не модель. Flet, LangGraph.">
+<meta property="og:url" content="https://rlebedev.dev/dialog-analyzer/">
+<meta property="og:image" content="https://rlebedev.dev/roman.jpg">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="rlebedev.dev">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0C0B09">
+<link rel="canonical" href="https://rlebedev.dev/dialog-analyzer/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230C0B09'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='26' font-weight='700' text-anchor='middle' fill='%23F0EAD6'%3Er%3Ctspan fill='%23F59E0B'%3E[d]%3C/tspan%3E%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400;1,7..72,600&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>.skip{position:absolute;left:-9999px;top:0;z-index:200;background:#F59E0B;color:#0C0B09;padding:.7rem 1.1rem;border-radius:0 0 4px 0;font-family:'JetBrains Mono',monospace;font-size:.78rem;text-decoration:none}.skip:focus{left:0}</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://rlebedev.dev/#website","url":"https://rlebedev.dev/","name":"rlebedev.dev","inLanguage":"ru-RU","publisher":{"@id":"https://rlebedev.dev/#person"}},{"@type":"WebPage","@id":"https://rlebedev.dev/dialog-analyzer/#webpage","url":"https://rlebedev.dev/dialog-analyzer/","name":"Dialog Analyzer — ИИ-разбор телефонных разговоров","description":"Транскрибация с разделением по спикерам, оценка диалога по методике руководителя, детерминированная сверка каждой цитаты. Итог считает код, а не модель. Flet, LangGraph.","inLanguage":"ru-RU","isPartOf":{"@id":"https://rlebedev.dev/#website"},"about":{"@id":"https://rlebedev.dev/dialog-analyzer/#work"},"breadcrumb":{"@id":"https://rlebedev.dev/dialog-analyzer/#crumbs"}},{"@type":"CreativeWork","@id":"https://rlebedev.dev/dialog-analyzer/#work","name":"Dialog Analyzer","description":"Транскрибация с разделением по спикерам, оценка диалога по методике руководителя, детерминированная сверка каждой цитаты. Итог считает код, а не модель. Flet, LangGraph.","inLanguage":"ru-RU","keywords":"распознавание речи, диаризация, LLM, LangGraph, оценка звонков","genre":"Разбор проекта","author":{"@id":"https://rlebedev.dev/#person"},"creator":{"@id":"https://rlebedev.dev/#person"}},{"@type":"BreadcrumbList","@id":"https://rlebedev.dev/dialog-analyzer/#crumbs","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://rlebedev.dev/"},{"@type":"ListItem","position":2,"name":"Dialog Analyzer","item":"https://rlebedev.dev/dialog-analyzer/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<style>
+:root{
+  /* Разбор разговора: серая бумага протокола, чернила, винный акцент.
+     Зелёный и янтарный — не украшение, а статусы сверки цитат. */
+  --ground:#0C0B09;
+  --surface:#15130E;
+  --surface-2:#1C1A14;
+  --ink:#F0EAD6;
+  --ink-2:#C9C1AD;
+  --ink-3:#8A8275;
+  --line:#1E1D19;
+  --line-2:#35332E;
+  --accent:#F59E0B;
+  --accent-soft:#2A1D07;
+  --on-accent:#0C0B09;
+  --ok:#5BC98A;
+  --ok-soft:#10251B;
+  --warn:#F5B14C;
+  --warn-soft:#2A2008;
+
+  --f-display:'Literata',Georgia,serif;
+  --f-body:'Onest','Segoe UI',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',monospace;
+
+  --col:min(800px,100% - 3rem);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C0B09;
+    --surface:#15130E;
+    --surface-2:#1C1A14;
+    --ink:#F0EAD6;
+    --ink-2:#C9C1AD;
+    --ink-3:#8A8275;
+    --line:#1E1D19;
+    --line-2:#35332E;
+    --accent:#F59E0B;
+    --accent-soft:#2A1D07;
+    --on-accent:#0C0B09;
+    --ok:#5BC98A;
+    --ok-soft:#10251B;
+    --warn:#F5B14C;
+    --warn-soft:#2A2008;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C0B09;
+  --surface:#15130E;
+  --surface-2:#1C1A14;
+  --ink:#F0EAD6;
+  --ink-2:#C9C1AD;
+  --ink-3:#8A8275;
+  --line:#1E1D19;
+  --line-2:#35332E;
+  --accent:#F59E0B;
+  --accent-soft:#2A1D07;
+  --on-accent:#0C0B09;
+  --ok:#5BC98A;
+  --ok-soft:#10251B;
+  --warn:#F5B14C;
+  --warn-soft:#2A2008;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--f-body);font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft);color:var(--ink)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+p{margin:0}
+
+section{display:flex;flex-direction:column;align-items:center}
+.col{width:var(--col)}
+.band{padding:clamp(3rem,7vw,4.9rem) 0}
+.band--paper{background:var(--surface);border-block:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:1.45rem}
+.head{display:flex;flex-direction:column;gap:.85rem}
+
+h1,h2{font-family:var(--f-display);font-weight:800;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(2.2rem,5.6vw,3.5rem);line-height:1.06}
+h2{font-size:clamp(1.6rem,3.5vw,2.2rem);line-height:1.14}
+h3{font-family:var(--f-body);font-weight:700;font-size:1.03rem;line-height:1.35;margin:0}
+.lede{font-size:1.15rem;color:var(--ink-2);line-height:1.58}
+.label{
+  font-family:var(--f-mono);font-size:.71rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);display:flex;align-items:center;gap:.7rem;
+}
+.label::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ── Шапка ─────────────────────────────────────────────────────────────── */
+.hero{padding:clamp(3rem,8vw,5.5rem) 0 0}
+.hero .col{display:flex;flex-direction:column;gap:1.5rem}
+.tagline{
+  align-self:flex-start;font-family:var(--f-mono);font-size:.72rem;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--ink-2);
+  border:1px solid var(--line-2);border-radius:2px;padding:.32rem .75rem;background:var(--surface);
+}
+h1 .u{
+  text-decoration:underline;text-decoration-color:var(--accent);
+  text-decoration-thickness:.11em;text-underline-offset:.13em;
+}
+
+/* ── Демонстрация: транскрипт с подтверждённой цитатой ─────────────────── */
+.demo{
+  border:1px solid var(--line);background:var(--surface);border-radius:3px;
+  display:grid;grid-template-columns:1fr;overflow:hidden;
+}
+.demo__bar{
+  display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+  padding:.6rem .95rem;border-bottom:1px solid var(--line);
+  font-family:var(--f-mono);font-size:.71rem;letter-spacing:.06em;color:var(--ink-3);
+}
+.demo__body{padding:1.1rem 1.15rem;display:flex;flex-direction:column;gap:.65rem}
+.turn{display:grid;grid-template-columns:5.4rem 1fr;gap:.75rem;font-size:.95rem;line-height:1.55}
+.turn .who{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-3);padding-top:.28rem;letter-spacing:.03em}
+.turn .said{color:var(--ink-2)}
+mark.q{
+  background:var(--ok-soft);color:var(--ink);
+  box-shadow:inset 0 -2px 0 var(--ok);padding:.05em .1em;border-radius:1px;
+}
+mark.qw{
+  background:var(--warn-soft);color:var(--ink);
+  box-shadow:inset 0 -2px 0 var(--warn);padding:.05em .1em;border-radius:1px;
+}
+.verdicts{border-top:1px solid var(--line);padding:.9rem 1.15rem;display:flex;flex-direction:column;gap:.6rem}
+.verdict{display:grid;grid-template-columns:auto 1fr auto;gap:.7rem;align-items:center;font-size:.9rem}
+.verdict .crit{font-family:var(--f-mono);font-size:.74rem;color:var(--ink-3)}
+.verdict .txt{color:var(--ink-2);min-width:0}
+.badge{
+  font-family:var(--f-mono);font-size:.68rem;letter-spacing:.05em;white-space:nowrap;
+  padding:.16rem .5rem;border-radius:2px;
+}
+.badge--ok{background:var(--ok-soft);color:var(--ok)}
+.badge--warn{background:var(--warn-soft);color:var(--warn)}
+.badge--none{background:var(--surface-2);color:var(--ink-3);text-decoration:line-through}
+@media (max-width:560px){
+  .turn{grid-template-columns:1fr;gap:.1rem}
+  .verdict{grid-template-columns:1fr;gap:.25rem}
+}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.kpi{background:var(--surface);padding:1rem 1.05rem}
+.kpi .v{font-family:var(--f-display);font-weight:800;font-size:1.7rem;line-height:1.1}
+.kpi .k{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:.35rem}
+
+/* ── Проблема ──────────────────────────────────────────────────────────── */
+.contrast{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1rem}
+.tile{border:1px solid var(--line);background:var(--surface);padding:1.3rem 1.35rem;display:flex;flex-direction:column;gap:.5rem}
+.band--paper .tile{background:var(--ground)}
+.tile .big{font-family:var(--f-display);font-weight:800;font-size:2rem;line-height:1.05;color:var(--accent)}
+.tile p{font-size:.95rem;color:var(--ink-2);line-height:1.5}
+
+/* ── Шаги ──────────────────────────────────────────────────────────────── */
+.flow{display:flex;flex-direction:column;gap:.5rem}
+.node{
+  display:grid;grid-template-columns:8.5rem 1fr;gap:1.1rem;align-items:start;
+  border:1px solid var(--line);background:var(--surface);padding:1.05rem 1.2rem;
+}
+.band--paper .node{background:var(--ground)}
+.node .by{
+  font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:.22rem .5rem;border-radius:2px;justify-self:start;
+}
+.by--model{background:var(--accent-soft);color:var(--accent)}
+.by--code{background:var(--ok-soft);color:var(--ok)}
+.by--human{background:var(--surface-2);color:var(--ink-2)}
+.node .t{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.node p{font-size:.94rem;color:var(--ink-2);line-height:1.5}
+@media (max-width:600px){.node{grid-template-columns:1fr;gap:.5rem}}
+
+/* ── Лестница правила ──────────────────────────────────────────────────── */
+.ladder{border:1px solid var(--line);background:var(--surface);font-family:var(--f-mono);font-size:.83rem;overflow-x:auto}
+.band--paper .ladder{background:var(--ground)}
+.rung{display:grid;grid-template-columns:2.6rem 1fr;gap:.9rem;padding:.62rem 1rem;border-bottom:1px solid var(--line);align-items:baseline;white-space:nowrap}
+.rung:last-child{border-bottom:none}
+.rung .g{font-family:var(--f-display);font-weight:800;font-size:1.25rem;color:var(--accent);text-align:center}
+.rung .c{color:var(--ink-2)}
+
+/* ── Карточки ──────────────────────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:1rem}
+.card{background:var(--surface);border:1px solid var(--line);padding:1.25rem 1.3rem;display:flex;flex-direction:column;gap:.5rem}
+.band--paper .card{background:var(--ground)}
+.card .tag{font-family:var(--f-mono);font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.card p{font-size:.94rem;color:var(--ink-2);line-height:1.5}
+
+/* ── Цифра-доказательство ──────────────────────────────────────────────── */
+.metric{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;align-items:center;
+  border:1px solid var(--line);border-left:3px solid var(--accent);
+  background:var(--surface);padding:1.2rem 1.3rem;
+}
+.band--paper .metric{background:var(--ground)}
+.metric .from,.metric .to{display:flex;flex-direction:column;gap:.2rem}
+.metric .n{font-family:var(--f-display);font-weight:800;font-size:2.1rem;line-height:1}
+.metric .from .n{color:var(--ink-3)}
+.metric .to .n{color:var(--ok)}
+.metric .cap{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.metric .why{font-size:.93rem;color:var(--ink-2);line-height:1.5}
+
+code{font-family:var(--f-mono);font-size:.85em;background:var(--surface-2);padding:.1em .36em;border-radius:2px;color:var(--ink)}
+
+/* ── Стек ──────────────────────────────────────────────────────────────── */
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem}
+.group{display:flex;flex-direction:column;gap:.55rem}
+.gname{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:.34rem}
+.chip{font-family:var(--f-mono);font-size:.77rem;padding:.25rem .55rem;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface);border-radius:2px}
+.band--paper .chip{background:var(--ground)}
+
+/* ── Финал ─────────────────────────────────────────────────────────────── */
+.cta .col{display:flex;flex-direction:column;gap:1.2rem}
+.btn{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:.55rem;
+  background:var(--accent);color:var(--on-accent);text-decoration:none;font-weight:700;
+  font-size:1rem;padding:.78rem 1.5rem;border-radius:2px;
+  transition:transform .18s ease,filter .18s ease;
+}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.offer{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:.9rem}
+.offer div{border-left:2px solid var(--accent);padding-left:.85rem;font-size:.93rem;color:var(--ink-2);line-height:1.5}
+.offer b{display:block;color:var(--ink);font-weight:700}
+footer{padding:1.5rem 0 3rem;color:var(--ink-3);font-family:var(--f-mono);font-size:.73rem;letter-spacing:.04em}
+footer .col{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+.rise{opacity:0;transform:translateY(12px);transition:opacity .55s ease,transform .55s ease}
+.rise.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .rise{opacity:1;transform:none;transition:none}
+  .btn{transition:none}
+}
+
+
+:root[data-theme="light"]{
+  --ground:#F3ECDC;
+  --surface:#FFFAEE;
+  --surface-2:#EFE6D2;
+  --ink:#1A1610;
+  --ink-2:#3D362B;
+  --ink-3:#6B6358;
+  --line:#E2D8C3;
+  --line-2:#CDC1A7;
+  --accent:#B44309;
+  --accent-soft:#F7E4D7;
+  --on-accent:#FFFAEE;
+  --ok:#12805A;
+  --ok-soft:#DBEFE4;
+  --warn:#A06A00;
+  --warn-soft:#F6E9CE;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Система rlebedev.dev — «терминал-журнал».
+   Тёплая бумага на почти чёрном, янтарь как акцент, серифный дисплей
+   рядом с моноширинным. Светлая тема — та же палитра на кремовом.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --r-lg:8px; --r-md:4px; --r-sm:3px;
+  --bar-h:62px;
+  --sh-1:none;
+  --sh-2:0 24px 48px -20px rgba(0,0,0,.55);
+  --accent-rgb:245,158,11;
+}
+:root[data-theme="light"]{
+  --sh-2:0 24px 48px -20px rgba(26,22,16,.22);
+  --accent-rgb:180,67,9;
+}
+
+body{padding-top:var(--bar-h)}
+::selection{background:var(--accent);color:var(--ground)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--ground)}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:5px;border:2px solid var(--ground)}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+[id]{scroll-margin-top:calc(var(--bar-h) + 1.2rem)}
+
+h1,h2{font-family:var(--f-display);font-weight:700;letter-spacing:-.035em;text-transform:none}
+h3{font-family:var(--f-display);font-weight:700;letter-spacing:-.02em;text-transform:none}
+.lede{color:var(--ink-2)}
+
+/* сетка в шапке страницы, как в терминале */
+.hero{
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+
+/* ── Верхняя панель ───────────────────────────────────────────────────── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:100;
+  background:var(--ground);border-bottom:1px solid var(--line);
+}
+@supports (backdrop-filter:blur(2px)){
+  .topbar{background:color-mix(in srgb,var(--ground) 78%,transparent);backdrop-filter:blur(16px)}
+}
+.topbar__in{
+  width:var(--col,min(880px,100% - 3rem));margin:0 auto;height:100%;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.topbar__mark{
+  font-family:var(--f-mono);font-weight:700;font-size:.98rem;letter-spacing:-.02em;
+  text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;
+}
+.topbar__mark b{color:var(--accent);font-weight:700}
+.topbar__mark s{text-decoration:none;color:var(--ink-3);font-weight:400}
+.topbar__mark i.caret{
+  font-style:normal;display:inline-block;width:.5em;height:1em;background:var(--accent);
+  margin-left:3px;vertical-align:text-bottom;animation:tbblink 1.1s steps(1) infinite;
+}
+@keyframes tbblink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.topbar__nav{display:flex;align-items:center;gap:.6rem}
+.topbar__link{
+  font-family:var(--f-mono);font-size:.78rem;color:var(--ink-2);text-decoration:none;
+  padding:.4rem .55rem;position:relative;transition:color .3s ease;
+}
+.topbar__link:hover{color:var(--ink)}
+.topbar__link::after{
+  content:"";position:absolute;left:.55rem;right:.55rem;bottom:.15rem;height:1px;
+  background:var(--accent);transform:scaleX(0);transform-origin:left;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.topbar__link:hover::after{transform:scaleX(1)}
+.topbar__theme{
+  width:32px;height:32px;border:1px solid var(--line-2);border-radius:999px;cursor:pointer;
+  background:var(--surface);color:var(--ink-3);display:grid;place-items:center;padding:0;
+  transition:all .3s ease;
+}
+.topbar__theme:hover{color:var(--accent);border-color:var(--accent)}
+.topbar__theme svg{width:15px;height:15px;display:block}
+.topbar__theme .sun{display:none}
+:root[data-theme="light"] .topbar__theme .sun{display:block}
+:root[data-theme="light"] .topbar__theme .moon{display:none}
+.topbar__cta{
+  font-family:var(--f-mono);font-size:.74rem;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;text-decoration:none;background:var(--accent);color:var(--ground);
+  padding:.55rem .95rem;border-radius:var(--r-md);white-space:nowrap;transition:all .3s ease;
+}
+.topbar__cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px -8px rgba(var(--accent-rgb),.55)}
+@media (max-width:640px){.topbar__link{display:none}}
+
+/* ── Геометрия ────────────────────────────────────────────────────────── */
+.card,.box,.doc,.panel,.tile,.kpi,.matrixwrap,.tablewrap,.shot,.frame,
+.readout,.demo,.pnl,.match,.calc,.pane,.sheet,.feed,.pipe,.cuts,.shotwrap,.offer,.groups{
+  border-radius:var(--r-md);
+}
+.readout,.demo,.pnl,.match,.calc,.pane,.sheet,.feed,.pipe,.cuts,.shotwrap{
+  overflow:hidden;box-shadow:var(--sh-2);
+}
+.kpis{background:transparent;border:0;gap:.75rem}
+.kpi{
+  background:var(--surface);border:1px solid var(--line);
+  transition:border-color .35s ease,transform .35s cubic-bezier(.34,1.4,.64,1);
+}
+.kpi:hover{border-color:var(--line-2);transform:translateY(-3px)}
+.kpi .v,.fact .v{font-family:var(--f-mono);letter-spacing:-.03em;color:var(--accent)}
+.card{
+  background:var(--surface);border:1px solid var(--line);box-shadow:none;
+  transition:border-color .35s ease,transform .4s cubic-bezier(.34,1.4,.64,1),box-shadow .4s ease;
+}
+.card:hover{border-color:var(--line-2);transform:translateY(-4px);box-shadow:var(--sh-2)}
+.band--paper .card,.band--paper .kpi,.band--up .card,.band--up .kpi{background:var(--ground)}
+.chip,.tag{border-radius:2px}
+.badge,.plate,.tagline,.live,.pill,.verdict{
+  border-radius:2px;font-family:var(--f-mono);letter-spacing:.1em;text-transform:uppercase;
+}
+.badge,.plate,.tagline,.live{
+  color:var(--accent);border:1px solid rgba(var(--accent-rgb),.5);
+  background:rgba(var(--accent-rgb),.08);
+}
+.btn{
+  border-radius:var(--r-md);font-family:var(--f-mono);font-size:.78rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;box-shadow:none;padding:.85rem 1.35rem;
+  transition:transform .3s ease,box-shadow .3s ease;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px -8px rgba(var(--accent-rgb),.55)}
+:focus-visible{border-radius:var(--r-sm)}
+
+/* ── Похожие проекты ──────────────────────────────────────────────────── */
+.rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+.rel a{
+  display:flex;flex-direction:column;gap:.55rem;padding:1.3rem;text-decoration:none;color:inherit;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+  transition:border-color .35s ease,transform .4s cubic-bezier(.34,1.4,.64,1);
+}
+.rel a:hover{border-color:var(--line-2);transform:translateY(-4px)}
+.rel .d{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.rel h3{font-size:1.08rem}
+.rel p{font-size:.9rem;line-height:1.55;color:var(--ink-2)}
+.rel .go{margin-top:auto;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-top:.5rem}
+</style>
+
+<!-- ─────────────────────────── ШАПКА ─────────────────────────── -->
+<header class="topbar">
+  <div class="topbar__in">
+    <a class="topbar__mark" href="/" aria-label="rlebedev.dev"><b>/</b>rlebe<b>[dev]</b><s>.dev</s><i class="caret"></i></a>
+    <nav class="topbar__nav" aria-label="Основное меню">
+      <a class="topbar__link" href="/uslugi/">услуги</a>
+      <a class="topbar__link" href="/#projects">проекты</a>
+      <button class="topbar__theme" type="button" data-theme-toggle aria-label="Сменить тему">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="topbar__cta" href="https://t.me/RomanL1991" target="_blank" rel="noopener">написать</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+
+
+<section class="hero">
+  <div class="col">
+    <span class="tagline">Dialog Analyzer · внутренний продукт розничной сети</span>
+    <h1>ИИ слушает все звонки. Оценку ставит <span class="u">код</span> — и её можно проверить</h1>
+    <p class="lede">
+      Система разбирает записи разговоров менеджеров с клиентами: распознаёт речь
+      с разделением по спикерам, оценивает диалог по методике руководителя и
+      выставляет 2/3/4/5 по заданному правилу. Каждое обоснование подтверждается
+      дословной цитатой из разговора — а если цитата выдумана, это видно сразу.
+    </p>
+
+    <div class="demo">
+      <div class="demo__bar">
+        <span>ЗАПИСЬ #418 · 07:12 · ДИАРИЗАЦИЯ: DEEPGRAM</span>
+      </div>
+      <div class="demo__body">
+        <div class="turn"><span class="who">Менеджер</span><span class="said">Здравствуйте! Меня зовут Алина, слушаю вас.</span></div>
+        <div class="turn"><span class="who">Клиент</span><span class="said">Здравствуйте, я по ковру, который у вас на витрине.</span></div>
+        <div class="turn"><span class="who">Менеджер</span><span class="said"><mark class="q">А как я могу к вам обращаться?</mark> Скажите, ковёр для гостиной или для спальни?</span></div>
+        <div class="turn"><span class="who">Клиент</span><span class="said">Марат. Для гостиной, комната большая.</span></div>
+        <div class="turn"><span class="who">Менеджер</span><span class="said"><mark class="qw">Марат, тогда лучше посмотреть вживую</mark> — размер на глаз не подобрать.</span></div>
+      </div>
+      <div class="verdicts">
+        <div class="verdict">
+          <span class="crit">client_name</span>
+          <span class="txt">Менеджер уточнил имя и дальше обращался по имени</span>
+          <span class="badge badge--ok">дословно</span>
+        </div>
+        <div class="verdict">
+          <span class="crit">appointment</span>
+          <span class="txt">Предложил приехать в шоурум</span>
+          <span class="badge badge--warn">неточно</span>
+        </div>
+        <div class="verdict">
+          <span class="crit">get_contact</span>
+          <span class="txt">«Записал номер телефона клиента»</span>
+          <span class="badge badge--none">не найдено</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="v">100%</div><div class="k">звонков разобрано</div></div>
+      <div class="kpi"><div class="v">4 + 2</div><div class="k">провайдера речи и LLM</div></div>
+      <div class="kpi"><div class="v">77%</div><div class="k">цитат дословно в тексте</div></div>
+      <div class="kpi"><div class="v">2/3/4/5</div><div class="k">ставит код, не модель</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── ПРОБЛЕМА ─────────────────────────── -->
+<section class="band">
+  <div class="col stack">
+    <div class="head">
+      <div class="label">Зачем это понадобилось</div>
+      <h2>Руководитель слушает пять звонков из пятисот — и делает выводы обо всех</h2>
+      <p class="lede">
+        Прослушать весь поток невозможно физически, поэтому выборку берут наугад,
+        а разговор оценивают по памяти. Менеджер узнаёт о проблеме через месяц на
+        разборе, а не в тот день, когда потерял клиента.
+      </p>
+    </div>
+
+    <div class="contrast">
+      <div class="tile">
+        <div class="big">5 / 500</div>
+        <h3>столько записей успевают послушать</h3>
+        <p>Остальные лежат в архиве телефонии как страховка на случай спора и никакой пользы не приносят.</p>
+      </div>
+      <div class="tile">
+        <div class="big">≠</div>
+        <h3>две оценки одного звонка не совпадают</h3>
+        <p>Даже у одного эксперта — а у двух тем более. Без письменной методики «хорошо» у каждого своё.</p>
+      </div>
+      <div class="tile">
+        <div class="big">?</div>
+        <h3>ИИ-оценка без доказательств бесполезна</h3>
+        <p>Модель убедительно объяснит любой балл и при этом сошлётся на фразу, которой в разговоре не было. Такой отчёт нельзя показать менеджеру.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── КАК УСТРОЕНА ОЦЕНКА ─────────────────────────── -->
+<section class="band band--paper">
+  <div class="col stack">
+    <div class="head">
+      <div class="label">Как считается оценка</div>
+      <h2>Модель делает только то, что умеет надёжно</h2>
+      <p class="lede">
+        Главное архитектурное решение проекта: LLM оценивает <em>пункты</em> методики,
+        а итоговую оценку звонка считает код. Иначе один и тот же разговор давал бы
+        разный результат при повторных прогонах — а от этих оценок зависят решения
+        о живых людях.
+      </p>
+    </div>
+
+    <div class="flow">
+      <div class="node rise">
+        <span class="by by--model">модель</span>
+        <div class="t">
+          <h3>Распознаёт речь и оценивает пункты</h3>
+          <p>Четыре провайдера транскрибации на выбор, три из них с разделением по спикерам. Дальше LLM выставляет баллы по каждому пункту методики, пишет комментарий и обязана привести цитату.</p>
+        </div>
+      </div>
+      <div class="node rise">
+        <span class="by by--code">код</span>
+        <div class="t">
+          <h3>Считает веса и проценты</h3>
+          <p>Нормализация балла по шкале пункта, взвешенная доля. Знаменатель — сумма весов <em>применимых</em> пунктов: разговор не штрафуется за то, чего в нём не могло быть.</p>
+        </div>
+      </div>
+      <div class="node rise">
+        <span class="by by--code">код</span>
+        <div class="t">
+          <h3>Выставляет 2, 3, 4 или 5 по правилу</h3>
+          <p>Правило исполняется структурой, а не текстом. Строки проверяются по возрастанию оценки, поэтому одна не может незаметно перекрыть другую — этот класс ошибок в правиле просто не возникает.</p>
+        </div>
+      </div>
+      <div class="node rise">
+        <span class="by by--human">человек</span>
+        <div class="t">
+          <h3>Не согласен — оставляет заметку</h3>
+          <p>Оператор указывает верный балл и почему. Заметка встаёт прямо под инструкцию своего пункта в промпте, и следующая оценка учитывает расхождение. Отключается галочкой, откатывается мгновенно.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── ПРАВИЛО ─────────────────────────── -->
+<section class="band">
+  <div class="col stack">
+    <div class="head">
+      <div class="label">Методика — это данные, а не код</div>
+      <h2>Руководитель пишет правило словами. Один раз</h2>
+      <p class="lede">
+        «Не назначил встречу в шоуруме — тройка». Модель переводит эту фразу в
+        структуру, человек сверяет разбор глазами и сохраняет. Дальше в оценке
+        звонков модели уже нет — исполняется сохранённая структура.
+      </p>
+    </div>
+
+    <div class="ladder">
+      <div class="rung"><span class="g">2</span><span class="c">← провален ≥1 из: needs, get_contact, communication_quality</span></div>
+      <div class="rung"><span class="g">3</span><span class="c">← провален ≥1 из: presentation, fitting, objections, appointment</span></div>
+      <div class="rung"><span class="g">3</span><span class="c">← провалено ≥2 любых пунктов</span></div>
+      <div class="rung"><span class="g">4</span><span class="c">← провален ≥1 любой пункт</span></div>
+      <div class="rung"><span class="g">5</span><span class="c">← по умолчанию</span></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="tag">Двойная проверка</div>
+        <h3>Разбору модели не верят на слово</h3>
+        <p>Модель ищет в тексте требования, которым не соответствует ни один пункт, и решения, принятые за автора — всегда с цитатой. Код ищет ссылки на несуществующие пункты, недостижимые и перекрытые строки, оценки вне диапазона. На живом разборе модель предложила бесполезную строку-перехватчик — поймал её код.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Версионирование</div>
+        <h3>Правка весов не переписывает историю</h3>
+        <p>Сохранение методики создаёт новую версию, прежняя остаётся вместе с оценёнными по ней записями. Статистика считается в разрезе одной версии: усреднять оценки по разным шкалам — значит складывать разное.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── ЦИТАТЫ ─────────────────────────── -->
+<section class="band band--paper">
+  <div class="col stack">
+    <div class="head">
+      <div class="label">Доверие к оценке</div>
+      <h2>Каждая цитата сверяется с транскриптом. Без участия модели</h2>
+      <p class="lede">
+        Сопоставить строку с текстом — задача сравнения строк, а не рассуждения.
+        Детерминированная сверка дешевле, воспроизводима и, в отличие от модели,
+        не может нагаллюцинировать себе подтверждение.
+      </p>
+    </div>
+
+    <div class="metric">
+      <div class="from"><span class="n">38%</span><span class="cap">проверка целой строкой</span></div>
+      <div class="to"><span class="n">77%</span><span class="cap">разбор по фрагментам</span></div>
+      <div class="why">
+        Модель часто кладёт в одно поле несколько цитат через точку с запятой.
+        Проверка «одной строкой» считала такую склейку выдумкой. Разбор по фрагментам
+        показал реальную картину: первое число было артефактом проверки.
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="tag">По худшему</div>
+        <h3>Одна выдуманная цитата портит всё обоснование</h3>
+        <p>Составная цитата проверяется по фрагментам, а итог берётся по худшему из них. Фрагменты короче трёх слов отбрасываются — совпадение по паре служебных слов нашлось бы в любом разговоре.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Подсветка</div>
+        <h3>От обоснования — к месту в разговоре</h3>
+        <p>Сверка запоминает границы фрагмента в символах, поэтому от оценки пункта можно перейти к реплике и обратно. Слабые совпадения не якорятся вовсе: показать пальцем на случайный кусок хуже, чем честно сказать «не найдено».</p>
+      </div>
+      <div class="card">
+        <div class="tag">Задним числом</div>
+        <h3>Работает и для старых записей</h3>
+        <p>Результат считается на лету из транскрипта и не хранится в базе — значит, сверка применилась ко всему архиву, оценённому до её появления.</p>
+      </div>
+      <div class="card">
+        <div class="tag">В отчёте</div>
+        <h3>Видно и в карточке, и в Excel</h3>
+        <p>Бейдж у каждой цитаты, сводка «подтверждено N из M» в карточке разговора и отдельная колонка в выгрузке. Метрика доверия к оценке, за которой можно следить как за показателем.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── АГЕНТ ─────────────────────────── -->
+<section class="band">
+  <div class="col stack">
+    <div class="head">
+      <div class="label">Чат-агент</div>
+      <h2>«У кого из менеджеров худшие показатели и почему»</h2>
+      <p class="lede">
+        Здесь агент оправдан: заранее неизвестно, сколько записей и каких придётся
+        прочитать. Реализация — LangGraph поверх ChatOpenAI, десять инструментов
+        над теми же данными, что видит интерфейс.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="tag">Только чтение</div>
+        <h3>Агент предлагает, решает человек</h3>
+        <p>Все инструменты read-only. Правка методики и настроек остаётся за людьми — агент может лишь показать, что стоит поменять и почему.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Границы</div>
+        <h3>Агенту запрещено считать оценку самому</h3>
+        <p>Итог разговора — поле из карточки, и только оно. Именно на этом расхождении система однажды и поймалась: карточка показывала 4.18, а агент, прочитавший текст методики, называл 3.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Секреты</div>
+        <h3>Ключи API агент не видит</h3>
+        <p>Инструмент настроек отдаёт «задан / не задан» вместо значения: попав в историю диалога, ключ уезжал бы к провайдеру модели с каждым следующим сообщением.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Контекст</div>
+        <h3>Длинный разговор не съедает окно</h3>
+        <p>Транскрипт отдаётся фрагментами по 6000 символов со смещением, число шагов ограничено. Ошибки провайдера переводятся в человеческие формулировки, сырой ответ API в чат не попадает.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── КОНТУР ─────────────────────────── -->
+<section class="band band--paper">
+  <div class="col stack">
+    <div class="head">
+      <div class="label">Контур и стек</div>
+      <h2>Один контейнер на своём сервере. Данные никуда не расползаются</h2>
+      <p class="lede">
+        Ни базы рядом, ни очереди, ни воркеров: состояние в SQLite, фоновая
+        обработка — asyncio-задачи в том же процессе. Всё, что требует моделей,
+        вынесено к облачным провайдерам по HTTPS; аудио, транскрипты, оценки и
+        ключи заказчика остаются на его машине.
+      </p>
+    </div>
+
+    <div class="groups">
+      <div class="group">
+        <div class="gname">Приложение</div>
+        <div class="chips"><span class="chip">Python 3.12</span><span class="chip">Flet / Material 3</span><span class="chip">asyncio</span><span class="chip">SQLite + aiosqlite</span><span class="chip">Docker</span></div>
+      </div>
+      <div class="group">
+        <div class="gname">Речь</div>
+        <div class="chips"><span class="chip">Deepgram</span><span class="chip">Gladia</span><span class="chip">Yandex SpeechKit</span><span class="chip">Groq Whisper</span><span class="chip">ffmpeg</span></div>
+      </div>
+      <div class="group">
+        <div class="gname">Оценка</div>
+        <div class="chips"><span class="chip">OpenAI</span><span class="chip">Perplexity Sonar</span><span class="chip">json_schema</span><span class="chip">LangGraph</span></div>
+      </div>
+      <div class="group">
+        <div class="gname">Отчёты</div>
+        <div class="chips"><span class="chip">openpyxl</span><span class="chip">flet-charts</span><span class="chip">flet-audio</span><span class="chip">PyInstaller (.exe)</span></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="tag">Два режима, один код</div>
+        <h3>Веб на сервере и .exe на столе</h3>
+        <p>Тот же пакет собирается в десктопное приложение через <code>flet pack</code>. Различий ровно три: загрузка файла, плеер и выгрузка Excel — всё остальное общее.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Совместимость</div>
+        <h3>Три поколения формата оценки читаются</h3>
+        <p>Архив, накопленный до перехода на настраиваемые методики, не потерян: поле версии схемы позволяет различить форматы, которые внешне выглядят одинаково.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Устойчивость</div>
+        <h3>Ошибка на любом шаге не роняет приложение</h3>
+        <p>Запись переходит в статус «ошибка» с сохранённым текстом причины, остальные продолжают обрабатываться. Нет ключа — понятное сообщение с просьбой указать его в настройках, а не трассировка стека.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Пороги достоверности</div>
+        <h3>Цифра не показывается, пока она не факт</h3>
+        <p>Динамика — только от шести разговоров, «слабое место» — если пункт встречался хотя бы в трёх, мини-график — от четырёх точек. Изменение меньше ±0.15 подписывается как «без изменений», а не как рост.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── ФИНАЛ ─────────────────────────── -->
+<section class="band cta">
+  <div class="col">
+    <div class="label">Дальше</div>
+    <h2>У вас записываются звонки. Их кто-нибудь слушает?</h2>
+    <p class="lede">
+      Продажи, поддержка, приём заявок — везде, где разговор решает деньги, архив
+      телефонии можно превратить в измеримое качество работы команды. Методика
+      ваша, критерии ваши, данные остаются на вашем сервере.
+    </p>
+
+    <div class="offer">
+      <div><b>Пилот на вашем архиве</b>Берём сотню реальных записей и показываем, что система в них видит.</div>
+      <div><b>Методика под вашу воронку</b>Пункты, шкалы, веса и правило итоговой оценки — под ваш скрипт продаж.</div>
+      <div><b>Внедрение и передача</b>Свой сервер или десктоп, документация и обучение тех, кто будет с этим работать.</div>
+    </div>
+
+    <a class="btn" href="https://rlebedev.dev" target="_blank" rel="noopener">Обсудить проект →</a>
+  </div>
+</section>
+
+
+<section class="band">
+  <div class="col stack">
+    <div class="head">
+      <div class="tab">Ещё проекты</div>
+      <h2>Похожие задачи в других отраслях</h2>
+    </div>
+    <div class="rel">
+      <a href="/tg-vitrina/">
+        <span class="d">E-commerce · SaaS</span>
+        <h3>Витрина в Telegram</h3>
+        <p>Магазин подключается тремя токенами и получает витрину прямо в мессенджере.</p>
+        <span class="go">смотреть кейс →</span>
+      </a>
+      <a href="/voltera-backend/">
+        <span class="d">B2B · e-commerce</span>
+        <h3>Каталог измерительной техники</h3>
+        <p>Фасетный поиск с умным сужением, коммерческие предложения с печатью в PDF.</p>
+        <span class="go">смотреть кейс →</span>
+      </a>
+      <a href="/opiu-moysklad/">
+        <span class="d">Финансы · виджет</span>
+        <h3>Управленческая отчётность для МойСклад</h3>
+        <p>ОПиУ, движение денег и управленческий баланс из живых данных учётной системы.</p>
+        <span class="go">смотреть кейс →</span>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="col">
+    <span>Роман Лебедев · Python / ИИ-интеграции</span>
+    <span>rlebedev.dev</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var rises = document.querySelectorAll('.rise');
+  if (reduce || !('IntersectionObserver' in window)) {
+    rises.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -10% 0px' });
+  rises.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  root.setAttribute('data-theme', 'dark');   /* тёмная по умолчанию */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function (b) {
+    b.addEventListener('click', function () {
+      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 't' || e.key === 'T' || e.key === 'е' || e.key === 'Е') {
+      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+  });
+})();
+</script>
+</body>
+</html>
